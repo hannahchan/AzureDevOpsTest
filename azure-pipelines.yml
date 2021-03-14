@@ -19,6 +19,10 @@ steps:
     custom: 'cake'
     arguments: '--Configuration=Release'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'Cobertura'

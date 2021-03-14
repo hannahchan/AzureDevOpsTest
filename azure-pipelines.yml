@@ -17,11 +17,11 @@ steps:
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: './Tests/**/coverage.cobertura.xml'
+    summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml'
     failIfCoverageEmpty: true
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: './Artifacts'
+    PathtoPublish: '$(Build.SourcesDirectory)/Artifacts'
     ArtifactName: 'myArtifacts'
     publishLocation: 'Container'

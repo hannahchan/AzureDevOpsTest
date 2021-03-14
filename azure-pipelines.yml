@@ -9,36 +9,36 @@ variables:
 
 steps:
   - task: DotNetCoreCLI@2
-    displayName: "Restore .NET Tools"
+    displayName: Restore .NET Tools
     inputs:
-      command: 'custom'
-      custom: 'tool'
-      arguments: 'restore'
+      command: custom
+      custom: tool
+      arguments: restore
 
   - task: DotNetCoreCLI@2
-    displayName: "Run Cake Build Script"
+    displayName: Run Cake Build Script
     inputs:
-      command: 'custom'
-      custom: 'cake'
-      arguments: '--Configuration=$(buildConfiguration)'
+      command: custom
+      custom: cake
+      arguments: --Configuration=$(buildConfiguration)
 
   - task: PublishTestResults@2
-    displayName: "Publish Test Results"
+    displayName: Publish Test Results
     inputs:
-      testResultsFormat: 'VSTest'
-      testResultsFiles: '$(Build.SourcesDirectory)/Tests/**/TestResults/*.trx'
-      mergeTestResults: false
       failTaskOnFailedTests: true
+      mergeTestResults: false
+      testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
+      testResultsFormat: VSTest
 
   - task: PublishCodeCoverageResults@1
-    displayName: "Publish Code Coverage Results"
+    displayName: Publish Code Coverage Results
     inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/TestResults/*/coverage.cobertura.xml'
+      codeCoverageTool: Cobertura
       failIfCoverageEmpty: true
+      summaryFileLocation: $(Build.SourcesDirectory)/Tests/**/TestResults/*/coverage.cobertura.xml
 
   - task: PublishBuildArtifacts@1
-    displayName: "Publish Release Artifact"
+    displayName: Publish Release Artifact
     inputs:
       artifactName: Release
       pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release

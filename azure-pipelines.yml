@@ -1,30 +1,37 @@
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 variables:
-  buildConfiguration: 'Release'
+  buildConfiguration: Release
 
 steps:
-- script: dotnet tool restore
-  displayName: Restore .NET Tools
+  - displayName: "Restore .NET Tools"
+    script: "dotnet tool restore"
 
-- script: dotnet cake --Configuration=$(buildConfiguration)
-  displayName: Run Cake Build Script
+  - displayName: "Run Cake Build Script"
+    script: "dotnet cake --Configuration=$(buildConfiguration)"
 
-- task: PublishCodeCoverageResults@1
-  displayName: Publish Code Coverage Results
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml'
-    reportDirectory: '$(Build.SourcesDirectory)/Test/CoverageReports/Combined'
-    failIfCoverageEmpty: true
+  - displayName: "Publish Code Coverage Results"
+    inputs:
+      codeCoverageTool: Cobertura
+      failIfCoverageEmpty: true
+      reportDirectory: $(Build.SourcesDirectory)/Test/CoverageReports/Combined
+      summaryFileLocation: $(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml
+    task: PublishCodeCoverageResults@1
 
-- task: PublishBuildArtifacts@1
-  displayName: Publish Artifacts
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/Artifacts'
-    ArtifactName: 'Artifacts'
-    publishLocation: 'Container'
+  - displayName: "Publish Release Artifact"
+    inputs:
+      ArtifactName: Release
+      PathtoPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
+      publishLocation: Container
+    task: PublishBuildArtifacts@1
+
+  - displayName: "Publish Code Coverage Report Artifacts"
+    inputs:
+      ArtifactName: CoverageReports
+      PathtoPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports
+      publishLocation: Container
+    task: PublishBuildArtifacts@1

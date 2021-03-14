@@ -1,0 +1,85 @@
+---
+services:
+  scaffold:
+    build:
+      context: "."
+      dockerfile: Sources/Scaffold.WebApi/Dockerfile
+    depends_on:
+      - postgres
+      - jaeger
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=postgres;Username=postgres;
+      ConnectionStrings__ReadOnlyConnection: Host=postgres;Port=5432;Database=postgres;Username=postgres;
+      Jaeger__AgentHost: jaeger
+    image: "${DOCKER_REGISTRY}scaffold"
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 80
+        target: 80
+      - mode: ingress
+        protocol: tcp
+        published: 8081
+        target: 8081
+  postgres:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: "postgres:alpine"
+    volumes:
+      - source: postgres_pgdata
+        target: /var/lib/postgresql/data
+        type: volume
+  grafana:
+    depends_on:
+      - jaeger
+      - prometheus
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Editor
+    image: grafana/grafana
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 3000
+        target: 3000
+    volumes:
+      - source: grafana
+        target: /var/lib/grafana
+        type: volume
+      - source: ./Operations/Grafana/dashboards
+        target: /etc/grafana/provisioning/dashboards
+        type: bind
+      - source: ./Operations/Grafana/datasources
+        target: /etc/grafana/provisioning/datasources
+        type: bind
+  jaeger:
+    image: "jaegertracing/all-in-one:latest"
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 16686
+        target: 16686
+    volumes:
+      - source: jaeger_tmp
+        target: /tmp
+        type: volume
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 9090
+        target: 9090
+    volumes:
+      - source: prometheus
+        target: /prometheus
+        type: volume
+      - source: ./Operations/Prometheus/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        type: bind
+version: "3.7"
+volumes:
+  grafana: ~
+  jaeger_tmp: ~
+  postgres_pgdata: ~
+  prometheus: ~

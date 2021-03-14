@@ -22,13 +22,6 @@ steps:
       publishLocation: Container
 
   - task: PublishBuildArtifacts@1
-    displayName: "Publish Code Coverage Results"
-    inputs:
-      artifactName: Code Coverage Report
-      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined
-      publishLocation: Container
-
-  - task: PublishBuildArtifacts@1
     displayName: "Publish Code Coverage Report Artifacts"
     inputs:
       artifactName: CoverageReports

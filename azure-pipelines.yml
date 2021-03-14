@@ -17,13 +17,9 @@ steps:
   inputs:
     command: 'custom'
     custom: 'cake'
-    arguments: '--Configuration=Release'
+    arguments: '--Target=Build --Configuration=Release'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: 'Tests/**/coverage.cobertura.xml'
+    arguments: '--collect:"XPlat Code Coverage" --configuration:Release --no-build'

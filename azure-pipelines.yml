@@ -15,14 +15,16 @@ steps:
   displayName: Run Cake Build Script
 
 - task: PublishCodeCoverageResults@1
+  displayName: Publish Code Coverage Results
   inputs:
     codeCoverageTool: 'Cobertura'
     summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml'
-    additionalCodeCoverageFiles: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports'
+    reportDirectory: '$(Build.SourcesDirectory)/Test/CoverageReports/Combined'
     failIfCoverageEmpty: true
 
 - task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
   inputs:
     PathtoPublish: '$(Build.SourcesDirectory)/Artifacts'
-    ArtifactName: 'myArtifacts'
+    ArtifactName: 'Artifacts'
     publishLocation: 'Container'

@@ -8,30 +8,30 @@ variables:
   buildConfiguration: Release
 
 steps:
-  - displayName: "Restore .NET Tools"
-    script: "dotnet tool restore"
+  - script: "dotnet tool restore"
+    displayName: "Restore .NET Tools"
 
-  - displayName: "Run Cake Build Script"
-    script: "dotnet cake --Configuration=$(buildConfiguration)"
+  - script: "dotnet cake --Configuration=$(buildConfiguration)"
+    displayName: "Run Cake Build Script"
 
-  - displayName: "Publish Code Coverage Results"
+  - task: PublishCodeCoverageResults@1
+    displayName: "Publish Code Coverage Results"
     inputs:
       codeCoverageTool: Cobertura
       failIfCoverageEmpty: true
       reportDirectory: $(Build.SourcesDirectory)/Test/CoverageReports/Combined
       summaryFileLocation: $(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml
-    task: PublishCodeCoverageResults@1
 
-  - displayName: "Publish Release Artifact"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Release Artifact"
     inputs:
-      ArtifactName: Release
-      PathtoPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
+      artifactName: Release
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
       publishLocation: Container
-    task: PublishBuildArtifacts@1
 
-  - displayName: "Publish Code Coverage Report Artifacts"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Code Coverage Report Artifacts"
     inputs:
-      ArtifactName: CoverageReports
-      PathtoPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports
+      artifactName: CoverageReports
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports
       publishLocation: Container
-    task: PublishBuildArtifacts@1

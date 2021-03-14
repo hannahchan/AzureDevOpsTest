@@ -1,0 +1,27 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- script: dotnet tool restore
+  displayName: Restore .NET Tools
+
+- script: dotnet cake --Configuration=$(buildConfiguration)
+  displayName: Run Cake Build Script
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: './Tests/**/coverage.cobertura.xml'
+    failIfCoverageEmpty: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: './Artifacts'
+    ArtifactName: 'myArtifacts'
+    publishLocation: 'Container'

@@ -6,13 +6,20 @@ pool:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: Restore .NET Tools
   inputs:
     command: 'custom'
     custom: 'tool'
     arguments: 'restore'
 
 - task: DotNetCoreCLI@2
+  displayName: Run Cake Build Script
   inputs:
     command: 'custom'
     custom: 'cake'
     arguments: '--Configuration=Release'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: 'Tests/**/coverage.cobertura.xml'

@@ -18,6 +18,7 @@ steps:
   inputs:
     codeCoverageTool: 'Cobertura'
     summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml'
+    additionalCodeCoverageFiles: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports'
     failIfCoverageEmpty: true
 
 - task: PublishBuildArtifacts@1

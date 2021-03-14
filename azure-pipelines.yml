@@ -14,19 +14,18 @@ steps:
   - script: "dotnet cake --Configuration=$(buildConfiguration)"
     displayName: "Run Cake Build Script"
 
-  - task: PublishCodeCoverageResults@1
-    displayName: "Publish Code Coverage Results"
-    inputs:
-      codeCoverageTool: Cobertura
-      failIfCoverageEmpty: true
-      reportDirectory: $(Build.SourcesDirectory)/Test/CoverageReports/Combined
-      summaryFileLocation: $(Build.SourcesDirectory)/Tests/**/coverage.cobertura.xml
-
   - task: PublishBuildArtifacts@1
     displayName: "Publish Release Artifact"
     inputs:
       artifactName: Release
       pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
+      publishLocation: Container
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Code Coverage Results"
+    inputs:
+      artifactName: Code Coverage Report
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined
       publishLocation: Container
 
   - task: PublishBuildArtifacts@1

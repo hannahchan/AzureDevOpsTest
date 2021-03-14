@@ -61,7 +61,9 @@ Task("Test")
         DotNetCoreTestSettings testSettings = new DotNetCoreTestSettings
         {
             ArgumentCustomization = args =>
-                args.Append("--collect:\"XPlat Code Coverage\""),
+                args
+                    .Append("--collect:\"XPlat Code Coverage\"")
+                    .Append("--logger:\"trx;\""),
             Configuration = configuration,
             NoBuild = true
         };
@@ -78,7 +80,7 @@ Task("Test")
         {
             ArgumentCustomization = args =>
                 args
-                    .Append($"-reports:\"./Tests/**/coverage.cobertura.xml\"")
+                    .Append($"-reports:\"./Tests/**/TestResults/*/coverage.cobertura.xml\"")
                     .Append($"-reporttypes:\"{reportTypes}\"")
                     .Append($"-targetdir:\"{coverageReports}/Combined\"")
                     .Append($"-historydir:\"{coverageHistory}/Combined\"")
@@ -90,7 +92,7 @@ Task("Test")
         {
             ArgumentCustomization = args =>
                 args
-                    .Append($"-reports:\"./Tests/IntegrationTests/**/coverage.cobertura.xml\"")
+                    .Append($"-reports:\"./Tests/IntegrationTests/**/TestResults/*/coverage.cobertura.xml\"")
                     .Append($"-reporttypes:\"{reportTypes}\"")
                     .Append($"-targetdir:\"{coverageReports}/IntegrationTests\"")
                     .Append($"-historydir:\"{coverageHistory}/IntegrationTests\"")
@@ -102,7 +104,7 @@ Task("Test")
         {
             ArgumentCustomization = args =>
                 args
-                    .Append($"-reports:\"./Tests/UnitTests/**/coverage.cobertura.xml\"")
+                    .Append($"-reports:\"./Tests/UnitTests/**/TestResults/*/coverage.cobertura.xml\"")
                     .Append($"-reporttypes:\"{reportTypes}\"")
                     .Append($"-targetdir:\"{coverageReports}/UnitTests\"")
                     .Append($"-historydir:\"{coverageHistory}/UnitTests\"")

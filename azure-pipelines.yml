@@ -8,19 +8,29 @@ variables:
   buildConfiguration: Release
 
 steps:
-  - task: DotNetCoreCLI@2
-    displayName: Restore
-    inputs:
-      command: 'restore'
+  - script: "dotnet tool restore"
+    displayName: "Restore .NET Tools"
 
-  - task: DotNetCoreCLI@2
-    displayName: Build
-    inputs:
-      command: 'build'
-      arguments: '--configuration $(buildConfiguration) --no-restore'
+  - script: "dotnet cake --Configuration=$(buildConfiguration)"
+    displayName: "Run Cake Build Script"
 
-  - task: DotNetCoreCLI@2
-    displayName: Test
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Release Artifact"
     inputs:
-      command: 'test'
-      arguments: '--configuration $(buildConfiguration) --no-build --collect "Code coverage"'
+      artifactName: Release
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
+      publishLocation: Container
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Code Coverage Results"
+    inputs:
+      artifactName: Code Coverage Report
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined
+      publishLocation: Container
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Code Coverage Report Artifacts"
+    inputs:
+      artifactName: CoverageReports
+      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports
+      publishLocation: Container

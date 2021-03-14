@@ -15,12 +15,19 @@ steps:
     displayName: "Run Cake Build Script"
 
   - task: PublishTestResults@2
+    displayName: "Publish Test Results"
     inputs:
       testResultsFormat: 'VSTest'
-      testResultsFiles: '**/*.trx'
-      searchFolder: '$(Build.SourcesDirectory)'
-      mergeTestResults: true
+      testResultsFiles: '$(Build.SourcesDirectory)/Tests/**/TestResults/*.trx'
+      mergeTestResults: false
       failTaskOnFailedTests: true
+
+  - task: PublishCodeCoverageResults@1
+    displayName: "Publish Code Coverage Results"
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(Build.SourcesDirectory)/Tests/**/TestResults/*/coverage.cobertura.xml'
+      failIfCoverageEmpty: true
 
   - task: PublishBuildArtifacts@1
     displayName: "Publish Release Artifact"

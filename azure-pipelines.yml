@@ -14,18 +14,19 @@ steps:
   - script: "dotnet cake --Configuration=$(buildConfiguration)"
     displayName: "Run Cake Build Script"
 
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'VSTest'
+      testResultsFiles: '**/*.trx'
+      searchFolder: '$(Build.SourcesDirectory)'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+
   - task: PublishBuildArtifacts@1
     displayName: "Publish Release Artifact"
     inputs:
       artifactName: Release
       pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
-      publishLocation: Container
-
-  - task: PublishBuildArtifacts@1
-    displayName: "Publish Code Coverage Results"
-    inputs:
-      artifactName: Code Coverage Report
-      pathToPublish: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined
       publishLocation: Container
 
   - task: PublishBuildArtifacts@1

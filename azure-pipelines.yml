@@ -26,16 +26,16 @@ steps:
     displayName: Publish Test Results
     inputs:
       failTaskOnFailedTests: true
-      mergeTestResults: false
+      mergeTestResults: true
       testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
       testResultsFormat: VSTest
+      testRunTitle: Scaffold Combined (Integration + Unit) Tests
 
   - task: PublishCodeCoverageResults@1
     displayName: Publish Code Coverage Results
     inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml'
-      reportDirectory: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined'
+      codeCoverageTool: "Cobertura"
+      summaryFileLocation: "$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml"
       failIfCoverageEmpty: true
 
   - task: PublishBuildArtifacts@1

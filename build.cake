@@ -134,8 +134,8 @@ Task("Publish")
         };
 
         DotNetCorePublish("./Sources/Scaffold.WebApi", settings);
-        Zip(settings.OutputDirectory, $"{settings.OutputDirectory}.zip");
-        DeleteDirectories(GetDirectories(settings.OutputDirectory.ToString()), deleteSettings);
+        // Zip(settings.OutputDirectory, $"{settings.OutputDirectory}.zip");
+        // DeleteDirectories(GetDirectories(settings.OutputDirectory.ToString()), deleteSettings);
     });
 
 //////////////////////////////////////////////////////////////////////

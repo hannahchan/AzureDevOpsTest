@@ -26,10 +26,10 @@ steps:
     displayName: Publish Test Results
     inputs:
       failTaskOnFailedTests: true
-      mergeTestResults: true
+      mergeTestResults: false
       testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
       testResultsFormat: VSTest
-      testRunTitle: Scaffold Combined (Integration + Unit) Tests
+      testRunTitle: Integration and Unit Tests
 
   - task: PublishCodeCoverageResults@1
     displayName: Publish Code Coverage Results

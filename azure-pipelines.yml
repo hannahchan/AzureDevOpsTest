@@ -1,9 +1,3 @@
-trigger:
-  - main
-
-pool:
-  vmImage: ubuntu-latest
-
 variables:
   buildConfiguration: Release
 
@@ -26,7 +20,7 @@ steps:
     displayName: Publish Test Results
     inputs:
       failTaskOnFailedTests: true
-      mergeTestResults: false
+      mergeTestResults: true
       testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
       testResultsFormat: VSTest
       testRunTitle: Integration and Unit Tests

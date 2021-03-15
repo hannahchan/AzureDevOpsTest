@@ -23,7 +23,7 @@ jobs:
         inputs:
           command: custom
           custom: cake
-          arguments: --Configuration=$(buildConfiguration)
+          arguments: --Configuration=$(buildConfiguration) --Target=Publish
 
       - task: PublishTestResults@2
         displayName: Publish Test Results

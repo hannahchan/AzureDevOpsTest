@@ -33,9 +33,10 @@ steps:
   - task: PublishCodeCoverageResults@1
     displayName: Publish Code Coverage Results
     inputs:
-      codeCoverageTool: Cobertura
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml'
+      reportDirectory: '$(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined'
       failIfCoverageEmpty: true
-      summaryFileLocation: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml
 
   - task: PublishBuildArtifacts@1
     displayName: Publish Release Artifact

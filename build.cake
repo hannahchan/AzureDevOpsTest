@@ -70,7 +70,7 @@ Task("Test")
 
         DotNetCoreTest(solution, testSettings);
 
-        string reportTypes = "Html";
+        string reportTypes = "Html;Cobertura";
         string coverageHistory = $"{testArtifacts}/CoverageHistory";
         string coverageReports = $"{testArtifacts}/CoverageReports";
 

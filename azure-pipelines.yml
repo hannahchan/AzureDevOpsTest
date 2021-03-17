@@ -49,12 +49,19 @@ jobs:
           publishLocation: Container
 
       - script: |
-          docker login --username=$username --password=$password
           docker image tag scaffold:latest hannahchan/scaffold:latest
-          docker image tag scaffold:latest hannahchan/scaffold:$(Build.SourceVersion)
-          docker image push hannahchan/scaffold:latest
-          docker image push hannahchan/scaffold:$(Build.SourceVersion)
+        displayName: Tag Docker Image
+
+      - task: Docker@2
+        displayName: Login to Docker Hub
+        inputs:
+          containerRegistry: 'Docker Hub - Hannah Chan'
+          command: 'login'
+
+      - task: Docker@2
         displayName: Publish to Docker Hub
-        env:
-          username: $(dockerHubUsername)
-          password: $(dockerHubPassword)
+        inputs:
+          containerRegistry: 'Docker Hub - Hannah Chan'
+          repository: 'hannahchan/scaffold'
+          command: 'push'
+          tags: '$(Build.SourceVersion)'

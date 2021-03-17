@@ -47,3 +47,14 @@ jobs:
           artifactName: Release
           pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi.zip
           publishLocation: Container
+
+      - script: |
+          docker login --username=$username --password=$password
+          docker image tag scaffold:latest hannahchan/scaffold:latest
+          docker image tag scaffold:latest hannahchan/scaffold:$(Build.SourceVersion)
+          docker image push hannahchan/scaffold:latest
+          docker image push hannahchan/scaffold:$(Build.SourceVersion)
+        displayName: Publish to Docker Hub
+        env:
+          username: $(dockerHubUsername)
+          password: $(dockerHubPassword)

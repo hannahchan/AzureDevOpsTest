@@ -205,7 +205,7 @@ namespace Scaffold.Repositories.UnitTests
                 Assert.Equal(typeof(BucketRepository).Assembly.GetName().Name, exception.Source);
             }
 
-            [Fact(DisplayName = "My DisplayName", Skip = "Not testable with Entity Framework Core In-Memory Database")]
+            [Fact(Skip = "Not testable with Entity Framework Core In-Memory Database")]
             public async Task When_AddingBucketAndCancellationIsRequested_Expect_OperationCanceledException()
             {
                 // Arrange

@@ -23,7 +23,7 @@ jobs:
         inputs:
           command: custom
           custom: cake
-          arguments: --Configuration=$(buildConfiguration) --Target=Publish
+          arguments: --Configuration=$(buildConfiguration) --Target=Containerize
 
       - task: PublishTestResults@2
         displayName: Publish Test Results
@@ -45,5 +45,5 @@ jobs:
         displayName: Publish Release Artifact
         inputs:
           artifactName: Release
-          pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Release
+          pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi.zip
           publishLocation: Container

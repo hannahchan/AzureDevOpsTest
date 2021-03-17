@@ -50,6 +50,8 @@ jobs:
 
       - script: |
           docker image tag scaffold:latest hannahchan/scaffold:latest
+          docker image tag scaffold:latest hannahchan/scaffold:$(Build.BuildId)
+          docker image tag scaffold:latest hannahchan/scaffold:$(Build.SourceVersion)
         displayName: Tag Docker Image
 
       - task: Docker@2
@@ -64,4 +66,7 @@ jobs:
           containerRegistry: 'Docker Hub - Hannah Chan'
           repository: 'hannahchan/scaffold'
           command: 'push'
-          tags: '$(Build.SourceVersion)'
+          tags: |
+            latest
+            $(Build.BuildId)
+            $(Build.SourceVersion)

@@ -24,7 +24,7 @@ steps:
     inputs:
       failTaskOnFailedTests: true
       mergeTestResults: true
-      testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
+      testResultsFiles: Tests/**/TestResults/*.trx
       testResultsFormat: VSTest
       testRunTitle: Integration and Unit Tests
 
@@ -32,14 +32,14 @@ steps:
     displayName: Publish Code Coverage Results
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml
+      summaryFileLocation: Artifacts/Test/CoverageReports/Combined/Cobertura.xml
       failIfCoverageEmpty: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Release Artifacts
     inputs:
       artifact: Artifacts
-      targetPath: $(Build.SourcesDirectory)/Artifacts
+      targetPath: Artifacts
       publishLocation: pipeline
 
   - task: Docker@2
@@ -48,8 +48,8 @@ steps:
       containerRegistry: Docker Hub - Hannah Chan
       repository: hannahchan/scaffold
       command: buildAndPush
-      Dockerfile: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/Dockerfile
-      buildContext: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/
+      Dockerfile: Artifacts/Build/Scaffold.WebApi/Dockerfile
+      buildContext: Artifacts/Build/Scaffold.WebApi/
       tags: |
         latest
         $(Build.BuildId)

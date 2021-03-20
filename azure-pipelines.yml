@@ -48,26 +48,24 @@ jobs:
     steps:
       - checkout: none
 
-      - script: ls -laR $(Pipeline.Workspace)
       - script: ls -laR $(Build.SourcesDirectory)
 
       - task: DownloadPipelineArtifact@2
         displayName: Download Release Artifacts
         inputs:
-          buildType: current
-          artifactName: Artifacts
-          itemPattern: Build/*.zip
+          artifact: Artifacts
+          patterns: Build/*.zip
+          path: $(Build.SourcesDirectory)
+          source: current
 
-      - script: ls -laR $(Pipeline.Workspace)
       - script: ls -laR $(Build.SourcesDirectory)
 
       - task: ExtractFiles@1
         inputs:
           archiveFilePatterns: Build/Scaffold.WebApi.zip
           cleanDestinationFolder: true
-          destinationFolder: Scaffold.WebApi
+          destinationFolder: Build/Scaffold.WebApi
 
-      - script: ls -laR $(Pipeline.Workspace)
       - script: ls -laR $(Build.SourcesDirectory)
 
       - task: Docker@2

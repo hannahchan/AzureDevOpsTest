@@ -1,82 +1,56 @@
+trigger:
+  - main
+
 pool:
   vmImage: ubuntu-latest
 
-jobs:
-  - job: publishReleaseArtifacts
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: Restore .NET Tools
+    inputs:
+      command: custom
+      custom: tool
+      arguments: restore
+
+  - task: DotNetCoreCLI@2
+    displayName: Run Cake Build Script
+    inputs:
+      command: custom
+      custom: cake
+      arguments: --Target=Publish
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      failTaskOnFailedTests: true
+      mergeTestResults: true
+      testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
+      testResultsFormat: VSTest
+      testRunTitle: Integration and Unit Tests
+
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish Code Coverage Results
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml
+      failIfCoverageEmpty: true
+
+  - task: PublishPipelineArtifact@1
     displayName: Publish Release Artifacts
-    steps:
-      - task: DotNetCoreCLI@2
-        displayName: Restore .NET Tools
-        inputs:
-          command: custom
-          custom: tool
-          arguments: restore
+    inputs:
+      artifact: Artifacts
+      targetPath: $(Build.SourcesDirectory)/Artifacts
+      publishLocation: pipeline
 
-      - task: DotNetCoreCLI@2
-        displayName: Run Cake Build Script
-        inputs:
-          command: custom
-          custom: cake
-          arguments: --Target=Publish
-
-      - task: PublishTestResults@2
-        displayName: Publish Test Results
-        inputs:
-          failTaskOnFailedTests: true
-          mergeTestResults: true
-          testResultsFiles: $(Build.SourcesDirectory)/Tests/**/TestResults/*.trx
-          testResultsFormat: VSTest
-          testRunTitle: Integration and Unit Tests
-
-      - task: PublishCodeCoverageResults@1
-        displayName: Publish Code Coverage Results
-        inputs:
-          codeCoverageTool: Cobertura
-          summaryFileLocation: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml
-          failIfCoverageEmpty: true
-
-      - task: PublishPipelineArtifact@1
-        displayName: Publish Release Artifacts
-        inputs:
-          artifact: Artifacts
-          targetPath: $(Build.SourcesDirectory)/Artifacts
-          publishLocation: pipeline
-
-  - job: publishContainerImages
-    dependsOn: publishReleaseArtifacts
-    displayName: Publish Container Images
-    steps:
-      - checkout: none
-
-      - script: ls -laR $(Build.SourcesDirectory)
-
-      - task: DownloadPipelineArtifact@2
-        displayName: Download Release Artifacts
-        inputs:
-          artifact: Artifacts
-          patterns: Build/*.zip
-          path: $(Build.SourcesDirectory)
-          source: current
-
-      - script: ls -laR $(Build.SourcesDirectory)
-
-      - task: ExtractFiles@1
-        inputs:
-          archiveFilePatterns: Build/Scaffold.WebApi.zip
-          cleanDestinationFolder: true
-          destinationFolder: Build/Scaffold.WebApi
-
-      - script: ls -laR $(Build.SourcesDirectory)
-
-      - task: Docker@2
-        displayName: Publish Container Image
-        inputs:
-          containerRegistry: Docker Hub - Hannah Chan
-          repository: hannahchan/scaffold
-          command: buildAndPush
-          Dockerfile: Build/Scaffold.WebApi/Dockerfile
-          buildContext: Build/Scaffold.WebApi/
-          tags: |
-            latest
-            $(Build.BuildId)
-            $(Build.SourceVersion)
+  - task: Docker@2
+    displayName: Publish Container Image
+    inputs:
+      containerRegistry: Docker Hub - Hannah Chan
+      repository: hannahchan/scaffold
+      command: buildAndPush
+      Dockerfile: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/Dockerfile
+      buildContext: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/
+      tags: |
+        latest
+        $(Build.BuildId)
+        $(Build.SourceVersion)

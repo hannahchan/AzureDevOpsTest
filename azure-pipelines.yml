@@ -35,9 +35,9 @@ jobs:
           summaryFileLocation: $(Build.SourcesDirectory)/Artifacts/Test/CoverageReports/Combined/Cobertura.xml
           failIfCoverageEmpty: true
 
-      - task: PublishBuildArtifacts@1
+      - task: PublishPipelineArtifact@1
         displayName: Publish Release Artifacts
         inputs:
-          artifactName: Artifacts
-          pathToPublish: $(Build.SourcesDirectory)/Artifacts
-          publishLocation: Container
+          artifact: Artifacts
+          targetPath: $(Build.SourcesDirectory)/Artifacts
+          publishLocation: pipeline

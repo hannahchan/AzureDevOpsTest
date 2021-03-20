@@ -1,12 +1,10 @@
-trigger:
-  - main
-
 pool:
   vmImage: ubuntu-latest
 
 jobs:
   - job: build
     displayName: Build
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
     steps:
       - task: DotNetCoreCLI@2
         displayName: Restore .NET Tools

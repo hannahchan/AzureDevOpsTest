@@ -48,12 +48,17 @@ jobs:
     steps:
       - checkout: none
 
+      - script: ls -laR $(Pipeline.Workspace)
+      - script: ls -laR $(Build.SourcesDirectory)
+
       - task: DownloadPipelineArtifact@2
         displayName: Download Release Artifacts
         inputs:
-          artifact: Artifacts
-          path: $(Build.SourcesDirectory)
+          buildType: current
+          artifactName: Artifacts
+          itemPattern: Build/*.zip
 
+      - script: ls -laR $(Pipeline.Workspace)
       - script: ls -laR $(Build.SourcesDirectory)
 
       - task: ExtractFiles@1
@@ -62,14 +67,17 @@ jobs:
           cleanDestinationFolder: true
           destinationFolder: Scaffold.WebApi
 
+      - script: ls -laR $(Pipeline.Workspace)
+      - script: ls -laR $(Build.SourcesDirectory)
+
       - task: Docker@2
         displayName: Publish Container Image
         inputs:
           containerRegistry: Docker Hub - Hannah Chan
           repository: hannahchan/scaffold
           command: buildAndPush
-          Dockerfile: $(Build.SourcesDirectory)/Build/Scaffold.WebApi/Dockerfile
-          buildContext: $(Build.SourcesDirectory)/Build/Scaffold.WebApi/
+          Dockerfile: Build/Scaffold.WebApi/Dockerfile
+          buildContext: Build/Scaffold.WebApi/
           tags: |
             latest
             $(Build.BuildId)

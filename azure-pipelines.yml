@@ -51,14 +51,14 @@ jobs:
       - task: DownloadPipelineArtifact@2
         displayName: Download Release Artifacts
         inputs:
-          artifact: Artifacts/Build/Scaffold.WebApi.zip
+          artifact: Artifacts
           path: $(Build.SourcesDirectory)
 
       - script: ls -laR $(Build.SourcesDirectory)
 
       - task: ExtractFiles@1
         inputs:
-          archiveFilePatterns: Scaffold.WebApi.zip
+          archiveFilePatterns: Build/Scaffold.WebApi.zip
           cleanDestinationFolder: true
           destinationFolder: Scaffold.WebApi
 
@@ -68,8 +68,8 @@ jobs:
           containerRegistry: Docker Hub - Hannah Chan
           repository: hannahchan/scaffold
           command: buildAndPush
-          Dockerfile: $(Build.SourcesDirectory)/Scaffold.WebApi/Dockerfile
-          buildContext: $(Build.SourcesDirectory)/Scaffold.WebApi/
+          Dockerfile: $(Build.SourcesDirectory)/Build/Scaffold.WebApi/Dockerfile
+          buildContext: $(Build.SourcesDirectory)/Build/Scaffold.WebApi/
           tags: |
             latest
             $(Build.BuildId)

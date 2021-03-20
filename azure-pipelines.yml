@@ -4,10 +4,6 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-variables:
-  buildConfiguration: Release
-  containerRepository: hannahchan/scaffold
-
 jobs:
   - job: build
     displayName: Build
@@ -24,7 +20,7 @@ jobs:
         inputs:
           command: custom
           custom: cake
-          arguments: --Configuration=$(buildConfiguration) --Target=Containerize
+          arguments: --Target=Publish
 
       - task: PublishTestResults@2
         displayName: Publish Test Results
@@ -43,31 +39,8 @@ jobs:
           failIfCoverageEmpty: true
 
       - task: PublishBuildArtifacts@1
-        displayName: Publish Release Artifact
+        displayName: Publish Release Artifacts
         inputs:
-          artifactName: Release
-          pathToPublish: $(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi.zip
+          artifactName: Artifacts
+          pathToPublish: $(Build.SourcesDirectory)/Artifacts
           publishLocation: Container
-
-      - script: |
-          docker image tag scaffold:latest $(containerRepository):latest
-          docker image tag scaffold:latest $(containerRepository):$(Build.BuildId)
-          docker image tag scaffold:latest $(containerRepository):$(Build.SourceVersion)
-        displayName: Tag Docker Image
-
-      # - task: Docker@2
-      #   displayName: Login to Docker Hub
-      #   inputs:
-      #     containerRegistry: Docker Hub - Hannah Chan
-      #     command: login
-
-      - task: Docker@2
-        displayName: Publish to Docker Hub
-        inputs:
-          containerRegistry: Docker Hub - Hannah Chan
-          repository: $(containerRepository)
-          command: push
-          tags: |
-            latest
-            $(Build.BuildId)
-            $(Build.SourceVersion)

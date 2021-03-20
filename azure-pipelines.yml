@@ -53,3 +53,15 @@ jobs:
         inputs:
           artifact: Artifacts
           path: $(Build.SourcesDirectory)
+      
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'Docker Hub - Hannah Chan'
+          repository: 'hannahchan/scaffold'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/Artifacts/Build/Scaffold.WebApi/'
+          tags: |
+            latest
+            $(Build.BuildId)
+            $(Build.SourceVersion)

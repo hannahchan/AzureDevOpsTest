@@ -41,3 +41,15 @@ jobs:
           artifact: Artifacts
           targetPath: $(Build.SourcesDirectory)/Artifacts
           publishLocation: pipeline
+
+  - job: publishContainerImages
+    dependsOn: publishReleaseArtifacts
+    displayName: Publish Container Images
+    steps:
+      - checkout: none
+
+      - task: DownloadPipelineArtifact@2
+        displayName: Download Release Artifacts
+        inputs:
+          artifact: Artifacts
+          path: $(Build.SourcesDirectory)

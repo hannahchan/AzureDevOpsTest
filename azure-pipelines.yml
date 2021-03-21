@@ -1,3 +1,5 @@
+# Example starter pipline for Azure DevOps
+
 trigger:
   - main
 
@@ -37,8 +39,6 @@ steps:
 
   - task: Docker@2
     displayName: Publish Container Image
-    env:
-      COMMIT_ID: $(Build.SourceVersion)
     inputs:
       buildContext: Artifacts/Build/Scaffold.WebApi/
       command: buildAndPush
@@ -47,4 +47,4 @@ steps:
       repository: hannahchan/scaffold
       tags: |
         latest
-        ${COMMIT_ID:0:7}
+        $(Build.SourceVersion)

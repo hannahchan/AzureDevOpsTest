@@ -34,16 +34,16 @@ steps:
     displayName: Publish Code Coverage Results
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: Artifacts/Test/CoverageReports/Combined/Cobertura.xml
+      summaryFileLocation: Artifacts/CoverageReports/Combined/Cobertura.xml
       failIfCoverageEmpty: true
 
   - task: Docker@2
     displayName: Publish Container Image
     inputs:
-      buildContext: Artifacts/Build/Scaffold.WebApi/
+      buildContext: Artifacts/Release/Scaffold.WebApi
       command: buildAndPush
       containerRegistry: Docker Hub - Hannah Chan
-      Dockerfile: Artifacts/Build/Scaffold.WebApi/Dockerfile
+      Dockerfile: Artifacts/Release/Scaffold.WebApi/Dockerfile
       repository: hannahchan/scaffold
       tags: |
         latest

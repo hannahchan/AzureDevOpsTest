@@ -9,8 +9,8 @@ string target = Argument("Target", "Publish");
 //////////////////////////////////////////////////////////////////////
 
 string artifacts = "./Artifacts";
-string buildArtifacts = $"{artifacts}/Build";
-string testArtifacts = $"{artifacts}/Test";
+string buildArtifacts = $"{artifacts}/Release";
+string testArtifacts = $"{artifacts}";
 
 string projectName = "Scaffold";
 string solution = "./Scaffold.sln";

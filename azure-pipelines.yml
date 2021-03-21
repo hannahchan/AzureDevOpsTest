@@ -35,13 +35,6 @@ steps:
       summaryFileLocation: Artifacts/Test/CoverageReports/Combined/Cobertura.xml
       failIfCoverageEmpty: true
 
-  - task: PublishPipelineArtifact@1
-    displayName: Publish Release Artifact
-    inputs:
-      artifact: Scaffold.WebApi
-      targetPath: Artifacts/Build/Scaffold.WebApi/
-      publishLocation: pipeline
-
   - task: Docker@2
     displayName: Publish Container Image
     inputs:
@@ -52,5 +45,4 @@ steps:
       repository: hannahchan/scaffold
       tags: |
         latest
-        $(Build.BuildId)
-        $(Build.SourceVersion)
+        $(Build.SourceVersion:0:7)

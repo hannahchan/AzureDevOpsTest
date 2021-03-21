@@ -37,6 +37,8 @@ steps:
 
   - task: Docker@2
     displayName: Publish Container Image
+    env:
+      COMMIT_ID: $(Build.SourceVersion)
     inputs:
       buildContext: Artifacts/Build/Scaffold.WebApi/
       command: buildAndPush
@@ -45,4 +47,4 @@ steps:
       repository: hannahchan/scaffold
       tags: |
         latest
-        $(Build.SourceVersion:0:7)
+        ${COMMIT_ID:0:7}

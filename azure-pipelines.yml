@@ -36,20 +36,20 @@ steps:
       failIfCoverageEmpty: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Publish Release Artifacts
+    displayName: Publish Release Artifact
     inputs:
-      artifact: Artifacts
-      targetPath: Artifacts
+      artifact: Scaffold.WebApi
+      targetPath: Artifacts/Build/Scaffold.WebApi/
       publishLocation: pipeline
 
   - task: Docker@2
     displayName: Publish Container Image
     inputs:
-      containerRegistry: Docker Hub - Hannah Chan
-      repository: hannahchan/scaffold
-      command: buildAndPush
-      Dockerfile: Artifacts/Build/Scaffold.WebApi/Dockerfile
       buildContext: Artifacts/Build/Scaffold.WebApi/
+      command: buildAndPush
+      containerRegistry: Docker Hub - Hannah Chan
+      Dockerfile: Artifacts/Build/Scaffold.WebApi/Dockerfile
+      repository: hannahchan/scaffold
       tags: |
         latest
         $(Build.BuildId)

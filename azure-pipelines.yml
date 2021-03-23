@@ -36,7 +36,7 @@ stages:
               testResultsFormat: VSTest
               testRunTitle: Integration and Unit Tests
 
-          - task: PublishCodeCoverageResults@2
+          - task: PublishCodeCoverageResults@1
             displayName: Publish Code Coverage Results
             inputs:
               codeCoverageTool: Cobertura

@@ -36,7 +36,7 @@ stages:
               testResultsFormat: VSTest
               testRunTitle: Integration and Unit Tests
 
-          - task: PublishCodeCoverageResults@1
+          - task: PublishCodeCoverageResults@2
             displayName: Publish Code Coverage Results
             inputs:
               codeCoverageTool: Cobertura
@@ -74,7 +74,7 @@ stages:
     jobs:
       - deployment: production
         displayName: Deploy to Production
-        environment: production
+        environment: Production
         strategy:
           runOnce:
             deploy:

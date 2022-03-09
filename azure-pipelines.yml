@@ -46,15 +46,15 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: Publish Release (Compressed File)
             inputs:
-              targetPath: 'Artifacts/Release'
-              artifact: 'Release'
-              publishLocation: 'pipeline'
+              targetPath: Artifacts/Release
+              artifact: Release
+              publishLocation: pipeline
 
           - task: ExtractFiles@1
             displayName: Prepare Release (Container Image)
             inputs:
-              archiveFilePatterns: 'Artifacts/Release/Scaffold.WebApi.zip'
-              destinationFolder: 'Artifacts/Release/Scaffold.WebApi'
+              archiveFilePatterns: Artifacts/Release/Scaffold.WebApi.zip
+              destinationFolder: Artifacts/Release/Scaffold.WebApi
               cleanDestinationFolder: true
               overwriteExistingFiles: false
 

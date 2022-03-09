@@ -44,10 +44,11 @@ stages:
               failIfCoverageEmpty: true
 
           - task: ExtractFiles@1
+            displayName: Extract
             inputs:
-              archiveFilePatterns: '**/*.zip'
-              destinationFolder: 'Artifacts/Release'
-              cleanDestinationFolder: false
+              archiveFilePatterns: 'Artifacts/Release/Scaffold.WebApi.zip'
+              destinationFolder: 'Artifacts/Release/Scaffold.WebApi'
+              cleanDestinationFolder: true
               overwriteExistingFiles: false
 
           - task: Docker@2

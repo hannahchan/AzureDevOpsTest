@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -9,6 +11,7 @@ string target = Argument("Target", "Publish");
 //////////////////////////////////////////////////////////////////////
 
 string artifacts = "./Artifacts";
+string auditArtifacts = $"{artifacts}/Audit";
 string buildArtifacts = $"{artifacts}/Release";
 string testArtifacts = $"{artifacts}";
 
@@ -20,27 +23,51 @@ string configuration = "Release";
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
-Task("Clean")
+Task("Audit")
+    .Description("Produces a \"Software Bill of Materials\" in CycloneDX format.")
     .Does(() =>
     {
-        DotNetCoreClean(solution, new DotNetCoreCleanSettings
+        DeleteDirectorySettings deleteSettings = new DeleteDirectorySettings
+        {
+            Force = true,
+            Recursive = true,
+        };
+
+        DeleteDirectories(GetDirectories(auditArtifacts), deleteSettings);
+
+        DotNetTool("CycloneDX", new DotNetToolSettings
+        {
+            ArgumentCustomization = args => args
+                .Append(solution)
+                .Append($"--json")
+                .Append($"--out {auditArtifacts}")
+        });
+    });
+
+Task("Clean")
+    .Description("Executes 'dotnet clean'.")
+    .Does(() =>
+    {
+        DotNetClean(solution, new DotNetCleanSettings
         {
             Configuration = configuration
         });
     });
 
 Task("Restore")
+    .Description("Executes 'dotnet restore'.")
     .Does(() =>
     {
-        DotNetCoreRestore(solution);
+        DotNetRestore(solution);
     });
 
 Task("Build")
+    .Description("Executes 'dotnet build'.")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        DotNetCoreBuild(solution, new DotNetCoreBuildSettings
+        DotNetBuild(solution, new DotNetBuildSettings
         {
             Configuration = configuration,
             NoRestore = true
@@ -48,6 +75,7 @@ Task("Build")
     });
 
 Task("Test")
+    .Description("Executes 'dotnet test' and produces code coverage reports.")
     .IsDependentOn("Build")
     .Does(() =>
     {
@@ -59,7 +87,7 @@ Task("Test")
 
         DeleteDirectories(GetDirectories("./Tests/**/TestResults"), deleteSettings);
 
-        DotNetCoreTestSettings testSettings = new DotNetCoreTestSettings
+        DotNetTestSettings testSettings = new DotNetTestSettings
         {
             ArgumentCustomization = args => args
                 .Append("--collect:\"XPlat Code Coverage\"")
@@ -70,7 +98,7 @@ Task("Test")
             NoBuild = true
         };
 
-        DotNetCoreTest(solution, testSettings);
+        DotNetTest(solution, testSettings);
 
         string coverageHistory = $"{testArtifacts}/CoverageHistory";
         string coverageReports = $"{testArtifacts}/CoverageReports";
@@ -79,7 +107,7 @@ Task("Test")
         DeleteDirectories(GetDirectories(coverageReports), deleteSettings);
 
         // Coverage Report - Combined (Integration + Unit) Tests
-        DotNetCoreTool("reportgenerator", new DotNetCoreToolSettings
+        DotNetTool("reportgenerator", new DotNetToolSettings
         {
             ArgumentCustomization = args => args
                 .Append($"-reports:\"./Tests/**/TestResults/*/coverage.cobertura.xml\"")
@@ -91,7 +119,7 @@ Task("Test")
         });
 
         // Coverage Report - Integration Tests
-        DotNetCoreTool("reportgenerator", new DotNetCoreToolSettings
+        DotNetTool("reportgenerator", new DotNetToolSettings
         {
             ArgumentCustomization = args => args
                 .Append($"-reports:\"./Tests/IntegrationTests/**/TestResults/*/coverage.cobertura.xml\"")
@@ -103,7 +131,7 @@ Task("Test")
         });
 
         // Coverage Report - Unit Tests
-        DotNetCoreTool("reportgenerator", new DotNetCoreToolSettings
+        DotNetTool("reportgenerator", new DotNetToolSettings
         {
             ArgumentCustomization = args => args
                 .Append($"-reports:\"./Tests/UnitTests/**/TestResults/*/coverage.cobertura.xml\"")
@@ -116,6 +144,7 @@ Task("Test")
     });
 
 Task("Publish")
+    .Description("Produces a release ready build.")
     .IsDependentOn("Test")
     .Does(() =>
     {
@@ -127,20 +156,34 @@ Task("Publish")
 
         DeleteDirectories(GetDirectories($"{buildArtifacts}"), deleteSettings);
 
-        DotNetCorePublishSettings settings = new DotNetCorePublishSettings
+        DotNetPublishSettings settings = new DotNetPublishSettings
         {
             Configuration = configuration,
             NoBuild = true,
             OutputDirectory = $"{buildArtifacts}/Scaffold.WebApi"
         };
 
-        DotNetCorePublish("./Sources/Scaffold.WebApi", settings);
+        DotNetPublish("./Sources/Scaffold.WebApi", settings);
+
+        ZipFile.CreateFromDirectory(
+            sourceDirectoryName: $"{settings.OutputDirectory}",
+            destinationArchiveFileName: $"{settings.OutputDirectory}.zip",
+            compressionLevel: CompressionLevel.SmallestSize,
+            includeBaseDirectory: false);
+
+        DeleteDirectories(GetDirectories(settings.OutputDirectory.ToString()), deleteSettings);
     });
 
 Task("Containerize")
+    .Description("Produces a release ready container image.")
     .IsDependentOn("Publish")
     .Does(() =>
     {
+        ZipFile.ExtractToDirectory(
+            sourceArchiveFileName: $"{buildArtifacts}/Scaffold.WebApi.zip",
+            destinationDirectoryName: $"{buildArtifacts}/Scaffold.WebApi",
+            overwriteFiles: true);
+
         StartProcess("docker", new ProcessSettings
         {
             Arguments = new ProcessArgumentBuilder()

@@ -1,14 +1,22 @@
 # Application Metrics
 
-Scaffold currently uses [prometheus-net](https://github.com/prometheus-net/prometheus-net) to instrument and expose application metrics. These metrics are by default exposed on the `/metrics` endpoint of the Web API and is intended to be _scraped_ by [Prometheus](https://prometheus.io/). You can change this endpoint by modifying the [`Startup.cs`](../Sources/Scaffold.WebApi/Startup.cs) file of the Web API. You'll need to further instrument your application if you require further metrics than those provided by the default implementation.
+Scaffold currently uses [prometheus-net](https://github.com/prometheus-net/prometheus-net) to instrument and expose application metrics. These metrics are by default exposed on the `/metrics` endpoint of the service and is intended to be _scraped_ by [Prometheus](https://prometheus.io/). You can change this endpoint by modifying the [`Startup.cs`](../Sources/Scaffold.WebApi/Startup.cs) file of the service.
 
 A future version of Scaffold will switch away from [prometheus-net](https://github.com/prometheus-net/prometheus-net) and instead will use the [OpenTelemetry](https://opentelemetry.io) observability framework for application metrics.
+
+## Dashboards
+
+Application metrics are often best view in a dashboard. A number of [dashboards](../Operations/Grafana/dashboards) have been included with Scaffold for use with Grafana.
 
 ## Metrics Port
 
 When you build a container image of Scaffold and run it, the metrics endpoint is exposed on port `8081` while the rest of the application remains on port `80`. Port `80` is intended to be the public port while port `8081` is the private port intended for monitoring services. You can change the ports used in the Scaffold container image by modifying the [Dockerfile](../Sources/Scaffold.WebApi/Dockerfile) used to build it and the [docker-compose.yml](../docker-compose.yml) used to run it.
 
 When Scaffold is run locally, the metrics endpoint is still exposed on port `8081` while the rest of the application is on port `5000`. You can change this by modifying [launchSettings.json](../Sources/Scaffold.WebApi/Properties/launchSettings.json).
+
+## Event Counter
+
+Included in the application layer of Scaffold is an [_EventCounter_](../Sources/Scaffold.Application/Components/Audit/EventCounter.cs) that counts all the messages that pass through the [in-process event bus](./Architecture.md). Rather than littering the codebase with increment statements, developers can simply publish an event and it will be counted with the other events of the same type.
 
 ## Example Queries
 

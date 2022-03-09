@@ -2,25 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "preLaunch",
-      "dependsOn": ["Build", "Start Infrastructure"],
+      "label": "PreLaunch",
+      "dependsOn": ["Start Infrastructure", "Build"],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     },
     {
-      "label": "postDebug",
+      "label": "PostDebug",
       "dependsOn": ["Stop Infrastructure"],
       "problemMatcher": []
-    },
-    {
-      "label": "Build",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["build"],
-      "problemMatcher": "$msCompile",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
     },
     {
       "label": "Clean",
@@ -37,20 +27,58 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Build",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Test",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["test"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
       "label": "Start Infrastructure",
       "command": "docker-compose",
       "windows": {
         "command": "docker-compose.exe"
       },
-      "dependsOn": ["Stop Infrastructure"],
       "type": "process",
       "args": ["up", "--detach", "postgres", "grafana", "jaeger", "prometheus"],
       "presentation": {
         "echo": true,
-        "reveal": "never",
+        "reveal": "always",
         "focus": false,
         "panel": "shared",
-        "showReuseMessage": true
+        "showReuseMessage": false,
+        "clear": true
       },
       "problemMatcher": []
     },
@@ -61,21 +89,14 @@
         "command": "docker-compose.exe"
       },
       "type": "process",
-      "args": [
-        "rm",
-        "--force",
-        "--stop",
-        "postgres",
-        "grafana",
-        "jaeger",
-        "prometheus"
-      ],
+      "args": ["down"],
       "presentation": {
         "echo": true,
-        "reveal": "never",
+        "reveal": "silent",
         "focus": false,
         "panel": "shared",
-        "showReuseMessage": true
+        "showReuseMessage": false,
+        "clear": true
       },
       "problemMatcher": []
     }

@@ -1,82 +1,60 @@
-namespace Scaffold.HttpClients.UnitTests
+#pragma warning disable IDISP014 // Use a single instance of HttpClient
+
+namespace Scaffold.HttpClients.UnitTests;
+
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
+
+public class ExampleHttpClientUnitTests
 {
-    using System;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Xunit;
-
-    public class ExampleHttpClientUnitTests
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("test")]
+    [InlineData("/test")]
+    public async Task When_InvokingGetWithPath_Expect_RequestUri(string path)
     {
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("test")]
-        [InlineData("/test")]
-        public async Task When_InvokingGetWithPath_Expect_RequestUri(string path)
+        // Arrange
+        string content = Guid.NewGuid().ToString();
+
+        using HttpResponseMessage response = new HttpResponseMessage
         {
-            // Arrange
-            string content = Guid.NewGuid().ToString();
+            Content = new StringContent(content),
+            StatusCode = HttpStatusCode.OK,
+        };
 
-            HttpResponseMessage response = new HttpResponseMessage
-            {
-                Content = new StringContent(content),
-                StatusCode = HttpStatusCode.OK,
-            };
+        Mock.HttpRequestHandler httpRequestHandler = new Mock.HttpRequestHandler(response);
 
-            HttpRequestHandler httpRequestHandler = new HttpRequestHandler(response);
+        using HttpClient httpClient = new HttpClient(httpRequestHandler);
+        ExampleHttpClient exampleHttpClient = new ExampleHttpClient(httpClient);
 
-            HttpResponseMessage result;
+        // Act
+        using HttpResponseMessage result = await exampleHttpClient.Get(path);
 
-            // Act
-            using (HttpClient httpClient = new HttpClient(httpRequestHandler))
-            {
-                ExampleHttpClient exampleHttpClient = new ExampleHttpClient(httpClient);
-                result = await exampleHttpClient.Get(path);
-            }
+        // Assert
+        Assert.Equal(HttpMethod.Get, result.RequestMessage.Method);
+        Assert.Equal($"https://worldtimeapi.org/{(path ?? string.Empty).TrimStart('/')}", result.RequestMessage.RequestUri.ToString());
+        Assert.Equal(content, await result.Content.ReadAsStringAsync());
+    }
 
-            // Assert
-            Assert.Equal(HttpMethod.Get, result.RequestMessage.Method);
-            Assert.Equal($"https://worldtimeapi.org/{(path ?? string.Empty).TrimStart('/')}", result.RequestMessage.RequestUri.ToString());
-            Assert.Equal(content, await result.Content.ReadAsStringAsync());
-        }
+    [Fact]
+    public async Task When_InvokingGetAndCancellationIsRequested_Expect_TaskCanceledException()
+    {
+        // Arrange
+        Mock.HttpRequestHandler httpRequestHandler = new Mock.HttpRequestHandler(new HttpResponseMessage());
 
-        [Fact]
-        public async Task When_InvokingGetAndCancellationIsRequested_Expect_OperationCanceledException()
-        {
-            // Arrange
-            HttpRequestHandler httpRequestHandler = new HttpRequestHandler(new HttpResponseMessage());
+        using HttpClient httpClient = new HttpClient(httpRequestHandler);
+        ExampleHttpClient exampleHttpClient = new ExampleHttpClient(httpClient);
 
-            Exception exception;
+        // Act
+        Task<HttpResponseMessage> TestFunction() => exampleHttpClient.Get(string.Empty, new CancellationToken(true));
+        Exception exception = await Record.ExceptionAsync(TestFunction);
 
-            // Act
-            using (HttpClient httpClient = new HttpClient(httpRequestHandler))
-            {
-                ExampleHttpClient exampleHttpClient = new ExampleHttpClient(httpClient);
-                exception = await Record.ExceptionAsync(() => exampleHttpClient.Get(string.Empty, new CancellationToken(true)));
-            }
-
-            // Assert
-            Assert.IsType<OperationCanceledException>(exception);
-        }
-
-        private class HttpRequestHandler : DelegatingHandler
-        {
-            private readonly HttpResponseMessage response;
-
-            public HttpRequestHandler(HttpResponseMessage response)
-            {
-                this.response = response;
-            }
-
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                this.response.RequestMessage = request;
-
-                return Task.FromResult(this.response);
-            }
-        }
+        // Assert
+        Assert.IsType<TaskCanceledException>(exception);
     }
 }

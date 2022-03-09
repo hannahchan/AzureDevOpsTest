@@ -51,7 +51,7 @@ stages:
               publishLocation: 'pipeline'
 
           - task: ExtractFiles@1
-            displayName: Extract Release
+            displayName: Prepare Release (Container Image)
             inputs:
               archiveFilePatterns: 'Artifacts/Release/Scaffold.WebApi.zip'
               destinationFolder: 'Artifacts/Release/Scaffold.WebApi'

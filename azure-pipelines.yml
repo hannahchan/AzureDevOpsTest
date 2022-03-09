@@ -43,6 +43,13 @@ stages:
               summaryFileLocation: Artifacts/CoverageReports/Combined/Cobertura.xml
               failIfCoverageEmpty: true
 
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: '**/*.zip'
+              destinationFolder: 'Artifacts/Release'
+              cleanDestinationFolder: false
+              overwriteExistingFiles: false
+
           - task: Docker@2
             displayName: Publish Container Image
             inputs:
